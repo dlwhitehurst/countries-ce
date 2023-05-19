@@ -1,0 +1,17 @@
+#%RAML 1.0
+
+title:       Pagination Prototype
+description: API returns 243 country records (paged)
+baseUri:     http://localhost:8081/api/v1/countries
+
+mediaType: application/json
+version: v1
+
+/static:
+  description: Dead simple initial output 
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+
