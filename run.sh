@@ -1,3 +1,10 @@
+#!/bin/bash
+#
+# run.sh - Bash script to package, containerize, and run this Mule deployment
+#
+#
+#
+
 mvn clean package
 
 docker build -t dlwhitehurst/countries-ce .
