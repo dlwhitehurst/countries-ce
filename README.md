@@ -25,6 +25,13 @@ starting the Mule server contained.
 An endpoint is hosted `http://localhost:8081/api/v1/countries/static` that provides a 
 JSON list of world countries.
 
+**What did we learn from this?**
+
+We learned that:
+
+1. Dataweave CAN be run on CE
+2. Dataweave scripts can be externalized to `/src/main/resource/modules`
+
 ## Build and Run
 To build and run this repo, just call the bash script `run.sh`.
 
