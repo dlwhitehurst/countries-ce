@@ -26,4 +26,83 @@
     <set-payload value="#[${file::modules/static2.dwl}]" />
     <set-payload value="#[${file::modules/trans.dwl}]" />
   </flow>
+
+  <flow name="get:\paged:router-config">
+    <set-variable value="#[200]" doc:name="httpStatus=200" variableName="httpStatus" />
+    <set-payload value="#[${file::modules/static.dwl}]" />
+    <flow-ref doc:name="pagination-analysis" name="pagination-analysis" />
+    <set-payload value="#[${file::modules/paged-payload.dwl}]" />
+    
+  </flow>
+
+  <!--- Pagination Analysis -->
+  <flow name="pagination-analysis">
+    <flow-ref doc:name="init-vars" name="init-vars"/>
+    <flow-ref doc:name="calc-vars" name="calc-vars"/>
+    <choice doc:name="Choice">
+			<when expression="#[vars.page as Number &gt; vars.numberPages as Number]">
+				<raise-error doc:name="Raise error" type="ERR:BAD_PAGE_NO" description="The page number is outside the scope of this request"/>
+			</when>
+			<when expression="#[vars.page &lt;= 0]">
+				<raise-error doc:name="Raise error" type="ERR:BAD_PAGE_NO" description="The page number is outside the scope of this request"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="calc-indices" name="calc-indices" />
+			</otherwise>
+		</choice>
+  </flow>
+
+  <sub-flow name="init-vars">
+    <set-variable value="#['/api/v1/countries/paged']" doc:name="Link Self" variableName="linkSelf" />
+    <set-variable value="#[attributes.queryParams.page]" doc:name="page" variableName="page" />
+    <set-variable value="#[attributes.queryParams.perPage]" doc:name="perPage" variableName="perPage" />
+    <set-variable value="#[sizeOf(payload.data)]" doc:name="initialSize" variableName="initialSize" />
+  </sub-flow>
+
+  <sub-flow name="calc-vars">
+    <choice doc:name="Choice">
+		  <when expression="#[vars.perPage as Number &lt;= 0]">
+				<raise-error doc:name="Raise error" type="ERR:PER_PAGE_ZERO_OR_LESS" description="Variable perPage cannot be zero or less."/>
+			</when>
+			<otherwise >
+				<set-variable value='#[%dw 2.0 output application/json ---
+          mod((vars.initialSize default 1),(vars.perPage default 1)) as String {format: "0"} as Number]' doc:name="Modulo" variableName="moduloRecords" />
+			</otherwise>
+		</choice>
+		<set-variable value='#[%dw 2.0 output application/json ---
+      if (vars.moduloRecords != 0) 
+        ((vars.initialSize default 1)/( vars.perPage default 1))  as String {format: "0", roundMode:"DOWN"} + 1
+      else
+        ((vars.initialSize default 1)/( vars.perPage default 1)) as String {format: "0", roundMode:"DOWN"}]' doc:name="numberPages" variableName="numberPages" />
+  </sub-flow>
+
+  <sub-flow name="calc-indices">
+		<choice doc:name="Choice">
+<!-- perPage > initialSize -->
+            <when expression="#[vars.perPage &gt; vars.initialSize]">
+				<raise-error doc:name="Raise error" type="ERR:PER_PAGE_EXCEEDS_DATA_SIZE" description="The variable perPage exceeds the initialSize variable"/>
+            </when>
+<!-- page 1, perPage == initialSize -->
+            <when expression="#[vars.perPage == vars.initialSize]">
+				<set-variable value="0" doc:name="startIndex" variableName="startIndex"/>
+				<set-variable value="#[vars.initialSize - 2]" doc:name="endIndex" variableName="endIndex"/>
+            </when>
+<!-- page 1, perPage > initialSize -->
+            <when expression="#[vars.page as Number == 1 and vars.numberPages == 1]">
+				<set-variable value="0" doc:name="startIndex" variableName="startIndex"/>
+				<set-variable value="#[vars.initialSize - 1]" doc:name="endIndex" variableName="endIndex"/>
+            </when>
+<!-- page == numberPages -->
+            <when expression="#[(vars.page as Number == vars.numberPages) and (vars.moduloRecords &gt; 0)]">
+				<set-variable value="#[vars.perPage * (vars.page - 1)]" doc:name="startIndex" variableName="startIndex"/>
+				<set-variable value="#[%dw 2.0 output application/java --- (vars.startIndex as Number) + (vars.moduloRecords as Number) - 1]" doc:name="endIndex" variableName="endIndex"/>
+            </when>
+<!-- default -->
+            <otherwise>
+				<set-variable value="#[vars.perPage * (vars.page - 1)]" doc:name="startIndex" variableName="startIndex"/>
+				<set-variable value="#[vars.startIndex + (vars.perPage -1 )]" doc:name="endIndex" variableName="endIndex"/>
+            </otherwise>
+        </choice>
+	</sub-flow>
+
 </mule>

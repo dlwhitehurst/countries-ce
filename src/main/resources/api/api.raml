@@ -33,3 +33,21 @@ version: v1
         body:
           application/xml:
 
+/paged:
+  get:
+    description: Retrieve all countries paginated (payload schema adds links)
+    queryParameters:
+      page:
+        example: 1
+        type: number
+        format: int
+        required: true
+      perPage:
+        example: 20
+        type: number
+        format: int
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
