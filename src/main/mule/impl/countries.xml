@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule 
+  xmlns="http://www.mulesoft.org/schema/mule/core" 
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+  xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="         
+    http://www.mulesoft.org/schema/mule/core         
+    http://www.mulesoft.org/schema/mule/core/current/mule.xsd         
+    http://www.mulesoft.org/schema/mule/http         
+    http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd         
+">
+
+  <flow name="get:\:router-config">
+    <flow-ref doc:name="deeper" name="deeper" />
+  </flow>
+
+  <flow name="deeper">
+    <set-variable value="#[200]" doc:name="httpStatus=200" variableName="httpStatus" />
+    <set-payload value="#[${file::modules/static.dwl}]" />
+  </flow>
+
+
+  <flow name="get:\xml:router-config">
+    <set-variable value="#[200]" doc:name="httpStatus=200" variableName="httpStatus" />
+    <set-payload value="#[${file::modules/static2.dwl}]" />
+    <set-payload value="#[${file::modules/trans.dwl}]" />
+  </flow>
+</mule>

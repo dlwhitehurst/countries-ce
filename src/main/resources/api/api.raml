@@ -15,3 +15,21 @@ version: v1
         body:
           application/json:
 
+
+/:
+  get:
+    description: Retrieve all countries unpaginated
+    responses:
+      200:
+        body:
+          application/json:
+
+
+/xml:
+  description: Retrieve countries in XML 
+  get:
+    responses:
+      200:
+        body:
+          application/xml:
+
