@@ -1,20 +1,3 @@
 {
-	"configs": [
-		"countries-ce.xml"
-	],
-	"secureProperties": [],
-	"redeploymentEnabled": true,
-	"name": "countries-ce",
-	"minMuleVersion": "4.1.0",
-	"requiredProduct": "MULE",
-	"classLoaderModelLoaderDescriptor": {
-		"id": "mule",
-		"attributes": {
-			"exportedResources": []
-		}
-	},
-	"bundleDescriptorLoader": {
-		"id": "mule",
-		"attributes": {}
-	}
+	"minMuleVersion": "4.1.0"
 }
