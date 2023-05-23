@@ -28,6 +28,7 @@
   </flow>
 
   <flow name="get:\paged:router-config">
+    <logger message="Paged: First of Flow" level="INFO"/>
     <set-variable value="#[200]" doc:name="httpStatus=200" variableName="httpStatus" />
     <set-payload value="#[${file::modules/static.dwl}]" />
     <flow-ref doc:name="pagination-analysis" name="pagination-analysis" />
@@ -37,6 +38,7 @@
 
   <!--- Pagination Analysis -->
   <flow name="pagination-analysis">
+    <logger message="Pagination Analysis?" level="INFO"/>
     <flow-ref doc:name="init-vars" name="init-vars"/>
     <flow-ref doc:name="calc-vars" name="calc-vars"/>
     <choice doc:name="Choice">
@@ -57,6 +59,8 @@
     <set-variable value="#[attributes.queryParams.page]" doc:name="page" variableName="page" />
     <set-variable value="#[attributes.queryParams.perPage]" doc:name="perPage" variableName="perPage" />
     <set-variable value="#[sizeOf(payload.data)]" doc:name="initialSize" variableName="initialSize" />
+    <logger message="The page is: #[attributes.queryParams.page]" level="INFO"/>
+    <logger message="The perPage is: #[attributes.queryParams.perPage]" level="INFO"/>
   </sub-flow>
 
   <sub-flow name="calc-vars">
